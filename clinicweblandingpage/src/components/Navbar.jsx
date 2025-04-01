@@ -99,9 +99,9 @@ export const Navbar = () => {
           <AnchorComponent
             link="#"
             className="hover:text-brightRed"
-            title={t("pricing")}
+            title={t("bookAppointment")}
           >
-            <Link to="/pricing">{t("pricing")}</Link>
+            <Link to="/pricing">{t("bookAppointment")}</Link>
           </AnchorComponent>
           <AnchorComponent
             link="#"

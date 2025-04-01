@@ -1,0 +1,20 @@
+{
+  "clinic:": "คลินิก",
+  "clinicName": "หมอมิ้นคลีนิคเวชกรรม",
+  "welcome": "ยินดีต้อนรับ",
+  "welcomeToTheClinic": "ยินดีต้อนรับสู่คลินิก",
+  "welcomeToTheClinicDashboard": "ยินดีต้อนรับสู่แดชบอร์ดคลินิก",
+  "welcomeBack": "ยินดีต้อนรับกลับ หมอมิ้นคลีนิคเวชกรรม",
+  "login": "เข้าสู่ระบบ",
+  "logout": "ออกจากระบบ",
+  "register": "ลงทะเบียน",
+  "registerNewUser": "ลงทะเบียนผู้ใช้ใหม่",
+  "registerNewUserDescription": "กรุณากรอกข้อมูลด้านล่างเพื่อสร้างบัญชีใหม่",
+  "email": "อีเมล",
+  "password": "รหัสผ่าน",
+  "confirmPassword": "ยืนยันรหัสผ่าน",
+  "firstName": "ชื่อ",
+  "lastName": "นามสกุล",
+  "phone": "เบอร์โทรศัพท์",
+  "CreateAccount": "กรุณาสร้างบัญชีเพื่อดำเนินการต่อ"
+}

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 function App() {
   const { t } = useTranslation();
+
   useEffect(() => {
     document.title = t("clinicName");
   });
