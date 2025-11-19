@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  tools {
+    node js 'node18'
+  }
 
   environment {
     APP_NAME        = "react-tailwind-app"
