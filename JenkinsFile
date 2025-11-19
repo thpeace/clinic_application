@@ -4,7 +4,7 @@ pipeline {
   environment {
     APP_NAME        = "react-tailwind-app"
     DOCKER_IMAGE    = "react-tailwind-app:latest"
-    BRANCH_NAME     = "main"
+    BRANCH_NAME     = "master"
     REMOTE_HOST     = "10.10.0.154"
     REMOTE_USER     = "docker"
   }
