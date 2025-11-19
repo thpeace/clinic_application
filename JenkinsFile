@@ -63,7 +63,7 @@ pipeline {
             sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no $SSH_USER@${REMOTE_HOST} "
               docker load -i /home/docker/reactapp.tar &&
               docker rm -f reactapp || true &&
-              docker run -d --name reactapp -p 80:80 ${DOCKER_IMAGE}
+              docker run -d --name reactapp -p 8081:80 ${DOCKER_IMAGE}
             "
           '''
         }
