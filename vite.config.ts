@@ -6,6 +6,7 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   build: {
     // incrase the chunk size warning limit to 2MB
+    outDir: "build",
     chunkSizeWarningLimit: 2048,
   },
   plugins: [
