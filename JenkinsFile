@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'jenkins-server' }  // Run pipeline on Jenkins server node
+  agent any
 
   environment {
     APP_NAME        = "react-tailwind-app"
