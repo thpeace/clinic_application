@@ -49,7 +49,7 @@ pipeline {
     stage('Build Docker Image for React') {
       steps {
         // Use a production Dockerfile that serves React app via Nginx
-        sh "docker build -t ${DOCKER_IMAGE} -f docker/Dockerfile.prod ."
+        sh "docker build -t ${DOCKER_IMAGE} -f Dockerfile ."
       }
     }
 
