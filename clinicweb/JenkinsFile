@@ -1,0 +1,93 @@
+pipeline {
+  agent any
+
+  environment {
+    APP_NAME        = "react-tailwind-app"
+    DOCKER_IMAGE    = "react-tailwind-app:latest"
+    BRANCH_NAME     = "main"
+    REMOTE_HOST     = "10.10.0.154"
+    REMOTE_USER     = "docker"
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps {
+        git branch: BRANCH_NAME,
+            url: 'https://github.com/thpeace/clinic_application',
+            credentialsId: 'github-credentials'
+      }
+    }
+
+    stage('Node Install & Build') {
+      steps {
+        sh 'npm install'
+        sh 'npm run build'
+      }
+      post {
+        success {
+          archiveArtifacts artifacts: 'build/**', fingerprint: true
+        }
+      }
+    }
+
+    stage('SonarQube Analysis') {
+      steps {
+        withSonarQubeEnv('SonarQube') {
+          sh '''
+            sonar-scanner \
+              -Dsonar.projectKey=react_tailwind \
+              -Dsonar.projectName=react_tailwind \
+              -Dsonar.sources=src \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_AUTH_TOKEN || true
+          '''
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 2, unit: 'MINUTES') {
+          script {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+              error "Quality gate failed: ${qg.status}"
+            }
+          }
+        }
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh "docker build -t ${DOCKER_IMAGE} ."
+      }
+    }
+
+    stage('Push Docker Image to Registry') {
+      steps {
+        script {
+          def fullImage = "${DOCKER_IMAGE}-${BUILD_NUMBER}"
+
+          withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'REG_USER', passwordVariable: 'REG_PASS')]) {
+            sh '''
+              echo "$REG_PASS" | docker login -u "$REG_USER" --password-stdin registry.example.com
+            '''
+
+            sh "docker tag ${DOCKER_IMAGE} registry.example.com/${fullImage}"
+            sh "docker push registry.example.com/${fullImage}"
+            sh "docker logout registry.example.com"
+          }
+
+          env.PUSHED_IMAGE = "registry.example.com/${fullImage}"
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo "Pipeline completed successfully" }
+    failure { echo "Pipeline failed" }
+  }
+}
