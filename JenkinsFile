@@ -46,28 +46,10 @@ pipeline {
       }
     }
 
-    // stage('Quality Gate') {
-    //   steps {
-    //     timeout(time: 2, unit: 'MINUTES') {
-    //       script {
-    //         def qg = waitForQualityGate()
-    //         if (qg.status != 'OK') {
-    //           error "Quality gate failed: ${qg.status}"
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
-    stage('Build Maven Project') {
+    stage('Build Docker Image for React') {
       steps {
-        sh "mvn clean package -DskipTests"
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
-        sh "docker build -t ${DOCKER_IMAGE} ."
+        // Use a production Dockerfile that serves React app via Nginx
+        sh "docker build -t ${DOCKER_IMAGE} -f Dockerfile.prod ."
       }
     }
 
@@ -81,7 +63,7 @@ pipeline {
             sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no $SSH_USER@${REMOTE_HOST} "
               docker load -i /home/docker/reactapp.tar &&
               docker rm -f reactapp || true &&
-              docker run -d --name reactapp -p 3000:80 ${DOCKER_IMAGE}
+              docker run -d --name reactapp -p 80:80 ${DOCKER_IMAGE}
             "
           '''
         }
