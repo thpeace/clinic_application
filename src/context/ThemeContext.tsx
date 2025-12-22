@@ -18,10 +18,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [theme, setTheme] = useState<Theme>("light");
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Helper function to check if it's currently Day or Night
+  const getDaylightTheme = (): Theme => {
+    const now = new Date();
+    const hours = now.getHours();
+    // Use Light mode between 6 AM (6) and 6 PM (18)
+    const isDayTime = hours >= 6 && hours < 18;
+    return isDayTime ? "light" : "dark";
+  };
+
   useEffect(() => {
     // This code will only run on the client side
     const savedTheme = localStorage.getItem("theme") as Theme | null;
-    const initialTheme = savedTheme || "light"; // Default to light theme
+
+    // IF user has a saved preference, use it.
+    // ELSE, calculate based on the time of day.
+    const initialTheme = savedTheme || getDaylightTheme();
 
     setTheme(initialTheme);
     setIsInitialized(true);
@@ -29,7 +41,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem("theme", theme);
+      // We ONLY update the DOM classes here.
+      // We do NOT save to localStorage here anymore.
+      // This keeps "Auto Mode" active until the user manually toggles.
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
       } else {
@@ -39,7 +53,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [theme, isInitialized]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    // We only save to storage when the User explicitily clicks the button
+    localStorage.setItem("theme", newTheme);
   };
 
   return (
