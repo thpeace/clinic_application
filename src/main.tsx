@@ -7,6 +7,9 @@ import App from "./App.tsx";
 import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 
+// Initialize i18n
+import "./i18n";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>

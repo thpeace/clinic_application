@@ -7,6 +7,7 @@ export default function MyHome() {
     const [description, setDescription] = useState("");
     return (
         <>
+            {/* This for dashboard page */}
             <PageMeta
                 title={title}
                 description={description}>
