@@ -68,8 +68,9 @@ apiClient.interceptors.response.use(
     async (error: AxiosError<ApiError>) => {
         const originalRequest = error.config;
 
-        // Handle 401 Unauthorized - token expired
-        if (error.response?.status === 401 && originalRequest) {
+        // Handle 401 Unauthorized - token expired (skip for login/auth requests)
+        const isAuthRequest = originalRequest?.url?.includes('/auth/');
+        if (error.response?.status === 401 && originalRequest && !isAuthRequest) {
             // Clear tokens and redirect to login
             localStorage.removeItem(STORAGE_KEYS.TOKEN);
             localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);

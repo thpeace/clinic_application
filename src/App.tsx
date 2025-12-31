@@ -18,7 +18,7 @@ import UserForm from "./pages/Forms/UserForm";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import Home from "./pages/Dashboard/Home";
+import MyHome from "./pages/Dashboard/MyHome";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -36,7 +36,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route index path="/" element={<Home />} />
+            <Route index path="/" element={<MyHome />} />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />

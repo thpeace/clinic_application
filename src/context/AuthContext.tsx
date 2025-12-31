@@ -9,11 +9,28 @@ import { ApiError } from "../api/client";
 // Types
 // ============================================================================
 
+export enum AuthErrorCode {
+    INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
+    NETWORK_ERROR = 'NETWORK_ERROR',
+    ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
+    FORBIDDEN = 'FORBIDDEN',
+    SESSION_EXPIRED = 'SESSION_EXPIRED',
+    SERVER_ERROR = 'SERVER_ERROR',
+    VALIDATION_ERROR = 'VALIDATION_ERROR',
+    UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+}
+
+export interface AuthError {
+    code: AuthErrorCode | string;
+    message: string;
+    status?: number;
+}
+
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    error: string | null;
+    error: AuthError | null;
     login: (credentials: LoginRequest) => Promise<AuthResponse>;
     signup: (userData: SignupRequest) => Promise<AuthResponse>;
     logout: () => void;
@@ -33,7 +50,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<AuthError | null>(null);
 
     // Check for existing auth on mount
     useEffect(() => {
@@ -64,7 +81,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return response;
         } catch (err) {
             const apiError = err as ApiError;
-            setError(apiError.message || "Login failed");
+
+            // Map HTTP status to error codes
+            console.log("apiError", apiError);
+            let errorCode: AuthErrorCode;
+            switch (apiError.status) {
+                case 401:
+                case 403:
+                    errorCode = AuthErrorCode.INVALID_CREDENTIALS;
+                    break;
+                case 423:
+                    errorCode = AuthErrorCode.ACCOUNT_LOCKED;
+                    break;
+                case 422:
+                    errorCode = AuthErrorCode.VALIDATION_ERROR;
+                    break;
+                case 500:
+                case 502:
+                case 503:
+                    errorCode = AuthErrorCode.SERVER_ERROR;
+                    break;
+                case 0:
+                    errorCode = AuthErrorCode.NETWORK_ERROR;
+                    break;
+                default:
+                    errorCode = AuthErrorCode.UNKNOWN_ERROR;
+            }
+
+            setError({
+                code: errorCode,
+                message: apiError.message || "Login failed",
+                status: apiError.status,
+            });
             throw err;
         } finally {
             setIsLoading(false);
@@ -81,7 +129,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return response;
         } catch (err) {
             const apiError = err as ApiError;
-            setError(apiError.message || "Signup failed");
+
+            // Map HTTP status to error codes
+            let errorCode: AuthErrorCode;
+            switch (apiError.status) {
+                case 403:
+                    errorCode = AuthErrorCode.INVALID_CREDENTIALS;
+                    break;
+                case 409:
+                    errorCode = AuthErrorCode.VALIDATION_ERROR; // Username already exists
+                    break;
+                case 422:
+                    errorCode = AuthErrorCode.VALIDATION_ERROR;
+                    break;
+                case 500:
+                case 502:
+                case 503:
+                    errorCode = AuthErrorCode.SERVER_ERROR;
+                    break;
+                case 0:
+                    errorCode = AuthErrorCode.NETWORK_ERROR;
+                    break;
+                default:
+                    errorCode = AuthErrorCode.UNKNOWN_ERROR;
+            }
+
+            setError({
+                code: errorCode,
+                message: apiError.message || "Signup failed",
+                status: apiError.status,
+            });
             throw err;
         } finally {
             setIsLoading(false);

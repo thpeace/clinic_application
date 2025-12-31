@@ -17,6 +17,15 @@ export interface SignupRequest {
     lastName?: string;
 }
 
+// Backend response structure
+export interface BackendAuthResponse {
+    username: string;
+    token: string;
+    type?: string;
+    expiresIn?: number;
+}
+
+// Frontend auth response
 export interface AuthResponse {
     token: string;
     refreshToken?: string;
@@ -24,12 +33,12 @@ export interface AuthResponse {
 }
 
 export interface User {
-    id: number;
+    id?: number;
     username: string;
-    email: string;
+    email?: string;
     firstName?: string;
     lastName?: string;
-    role: string;
+    role?: string;
 }
 
 // ============================================================================
@@ -41,15 +50,27 @@ const authService = {
      * Login with username and password
      */
     async login(credentials: LoginRequest): Promise<AuthResponse> {
-        const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+        console.log("apiClient", apiClient);
+        const response = await apiClient.post<BackendAuthResponse>('/auth/login', credentials);
+
+        // Map backend response to frontend structure
+        const user: User = {
+            username: response.data.username,
+            // Add other fields if needed from backend
+        };
+
+        const authResponse: AuthResponse = {
+            token: response.data.token,
+            user: user,
+        };
 
         // Store token and user data
-        if (response.data.token) {
-            setAuthToken(response.data.token);
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+        if (authResponse.token) {
+            setAuthToken(authResponse.token);
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
         }
 
-        return response.data;
+        return authResponse;
     },
 
     /**

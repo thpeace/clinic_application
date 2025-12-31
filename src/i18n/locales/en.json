@@ -42,7 +42,15 @@
         "noAccount": "Don't have an account?",
         "haveAccount": "Already have an account?",
         "loginFailed": "Login failed. Please check your credentials.",
-        "signupFailed": "Signup failed. Please try again."
+        "signupFailed": "Signup failed. Please try again.",
+        "errors": {
+            "invalidCredentials": "Invalid username or password. Please try again.",
+            "accountLocked": "Your account has been locked. Please contact support.",
+            "networkError": "Network error. Please check your internet connection and try again.",
+            "serverError": "Server error. Please try again later.",
+            "validationError": "Please check your input and try again.",
+            "unknownError": "An unexpected error occurred. Please try again."
+        }
     },
     "nav": {
         "dashboard": "Dashboard",
@@ -62,7 +70,9 @@
         "overview": "Overview",
         "totalPatients": "Total Patients",
         "totalProducts": "Total Products",
-        "recentActivity": "Recent Activity"
+        "recentActivity": "Recent Activity",
+        "customers": "Customers",
+        "orders": "Orders"
     },
     "patient": {
         "title": "Patients",
