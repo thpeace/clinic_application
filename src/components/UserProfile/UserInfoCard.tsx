@@ -3,8 +3,14 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
+import type { User } from "../../types/user";
+import { RoleDisplayName } from "../../constants/userRoles";
 
-export default function UserInfoCard() {
+interface UserInfoCardProps {
+  dataUser: User | null;
+}
+
+export default function UserInfoCard({ dataUser }: UserInfoCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here
@@ -25,7 +31,7 @@ export default function UserInfoCard() {
                 First Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Musharof
+                {dataUser?.firstName || '-'}
               </p>
             </div>
 
@@ -34,7 +40,7 @@ export default function UserInfoCard() {
                 Last Name
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Chowdhury
+                {dataUser?.lastName || '-'}
               </p>
             </div>
 
@@ -43,7 +49,7 @@ export default function UserInfoCard() {
                 Email address
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                randomuser@pimjo.com
+                {dataUser?.email || '-'}
               </p>
             </div>
 
@@ -52,16 +58,16 @@ export default function UserInfoCard() {
                 Phone
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                +09 363 398 46
+                {dataUser?.phoneNumber || '-'}
               </p>
             </div>
 
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Bio
+                Role
               </p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                Team Manager
+                {dataUser?.role ? RoleDisplayName[dataUser.role] : '-'}
               </p>
             </div>
           </div>
@@ -102,7 +108,7 @@ export default function UserInfoCard() {
           </div>
           <form className="flex flex-col">
             <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-              <div>
+              {/* <div>
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Social Links
                 </h5>
@@ -134,7 +140,7 @@ export default function UserInfoCard() {
                     <Input type="text" value="https://instagram.com/PimjoHQ" />
                   </div>
                 </div>
-              </div>
+              </div> */}
               <div className="mt-7">
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Personal Information
@@ -143,27 +149,27 @@ export default function UserInfoCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input type="text" value="Musharof" />
+                    <Input type="text" value={dataUser?.firstName || ''} />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input type="text" value="Chowdhury" />
+                    <Input type="text" value={dataUser?.lastName || ''} />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Email Address</Label>
-                    <Input type="text" value="randomuser@pimjo.com" />
+                    <Input type="text" value={dataUser?.email || ''} />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Phone</Label>
-                    <Input type="text" value="+09 363 398 46" />
+                    <Input type="text" value={dataUser?.phoneNumber || ''} />
                   </div>
 
                   <div className="col-span-2">
-                    <Label>Bio</Label>
-                    <Input type="text" value="Team Manager" />
+                    <Label>Role</Label>
+                    <Input disabled={true} type="text" value={dataUser?.role ? RoleDisplayName[dataUser.role] : ''} />
                   </div>
                 </div>
               </div>

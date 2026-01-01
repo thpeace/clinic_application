@@ -3,14 +3,19 @@ import { Modal } from "../ui/modal";
 import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
-
-export default function UserAddressCard() {
+import { User } from "../../types";
+interface UserAddressCardProps {
+  dataUser: User | null;
+}
+export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here
     console.log("Saving changes...");
     closeModal();
   };
+
+  const cityState = `${dataUser?.province}, ${dataUser?.country}`;
   return (
     <>
       <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
@@ -26,7 +31,7 @@ export default function UserAddressCard() {
                   Country
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  United States.
+                  {dataUser?.country}
                 </p>
               </div>
 
@@ -35,7 +40,7 @@ export default function UserAddressCard() {
                   City/State
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Phoenix, Arizona, United States.
+                  {cityState}
                 </p>
               </div>
 
@@ -44,18 +49,18 @@ export default function UserAddressCard() {
                   Postal Code
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  ERT 2489
+                  {dataUser?.postalCode}
                 </p>
               </div>
 
-              <div>
+              {/* <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                   TAX ID
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   AS4568384
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -97,23 +102,23 @@ export default function UserAddressCard() {
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <Label>Country</Label>
-                  <Input type="text" value="United States" />
+                  <Input type="text" value={dataUser?.country} />
                 </div>
 
                 <div>
                   <Label>City/State</Label>
-                  <Input type="text" value="Arizona, United States." />
+                  <Input type="text" value={cityState} />
                 </div>
 
                 <div>
                   <Label>Postal Code</Label>
-                  <Input type="text" value="ERT 2489" />
+                  <Input type="text" value={dataUser?.postalCode} />
                 </div>
 
-                <div>
+                {/* <div>
                   <Label>TAX ID</Label>
                   <Input type="text" value="AS4568384" />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

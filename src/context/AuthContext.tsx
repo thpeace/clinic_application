@@ -1,8 +1,7 @@
-"use client";
-
 import type React from "react";
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
-import authService, { User, LoginRequest, SignupRequest, AuthResponse } from "../api/authService";
+import authApi from "../api/authApi";
+import type { AuthUser, LoginRequest, SignupRequest, AuthResponse } from "../types/auth";
 import { ApiError } from "../api/client";
 
 // ============================================================================
@@ -27,7 +26,7 @@ export interface AuthError {
 }
 
 interface AuthContextType {
-    user: User | null;
+    user: AuthUser | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: AuthError | null;
@@ -48,27 +47,38 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // ============================================================================
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<AuthError | null>(null);
 
-    // Check for existing auth on mount
+    // Check for existing auth on mount and set up event listener
     useEffect(() => {
         const initAuth = () => {
             try {
-                const currentUser = authService.getCurrentUser();
-                if (currentUser && authService.isAuthenticated()) {
+                const currentUser = authApi.getStoredUser();
+                if (currentUser && authApi.isAuthenticated()) {
                     setUser(currentUser);
                 }
             } catch {
                 // Invalid stored data, clear it
-                authService.logout();
+                authApi.logout();
             } finally {
                 setIsLoading(false);
             }
         };
 
+        const handleLogoutEvent = () => {
+            setUser(null);
+            setError(null);
+            authApi.logout();
+        };
+
         initAuth();
+        window.addEventListener('auth:logout', handleLogoutEvent);
+
+        return () => {
+            window.removeEventListener('auth:logout', handleLogoutEvent);
+        };
     }, []);
 
     const login = useCallback(async (credentials: LoginRequest): Promise<AuthResponse> => {
@@ -76,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(null);
 
         try {
-            const response = await authService.login(credentials);
+            const response = await authApi.login(credentials);
             setUser(response.user);
             return response;
         } catch (err) {
@@ -124,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(null);
 
         try {
-            const response = await authService.signup(userData);
+            const response = await authApi.signup(userData);
             setUser(response.user);
             return response;
         } catch (err) {
@@ -168,7 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logout = useCallback(() => {
         setUser(null);
         setError(null);
-        authService.logout();
+        authApi.logout();
     }, []);
 
     const clearError = useCallback(() => {

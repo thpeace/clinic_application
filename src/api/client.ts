@@ -28,6 +28,12 @@ const STORAGE_KEYS = {
     USER: 'user',
 } as const;
 
+// Status codes that trigger auto-logout
+const LOGOUT_STATUS_CODES = new Set([
+    401, // Unauthorized
+    403, // Forbidden
+]);
+
 // ============================================================================
 // Axios Instance
 // ============================================================================
@@ -68,16 +74,26 @@ apiClient.interceptors.response.use(
     async (error: AxiosError<ApiError>) => {
         const originalRequest = error.config;
 
-        // Handle 401 Unauthorized - token expired (skip for login/auth requests)
+        // Handle 401 (Unauthorized), 403 (Forbidden), or Network Error (status 0/undefined)
         const isAuthRequest = originalRequest?.url?.includes('/auth/');
-        if (error.response?.status === 401 && originalRequest && !isAuthRequest) {
-            // Clear tokens and redirect to login
+        const status = error.response?.status;
+
+        // Check if we should logout:
+        // 1. It's not a login/signup request (auth)
+        // 2. Status is in our LOGOUT set OR it's a network error (!status)
+        const shouldLogout =
+            originalRequest &&
+            !isAuthRequest &&
+            (LOGOUT_STATUS_CODES.has(status!) || !status);
+
+        if (shouldLogout) {
+            // Clear tokens
             localStorage.removeItem(STORAGE_KEYS.TOKEN);
             localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
             localStorage.removeItem(STORAGE_KEYS.USER);
 
-            // Redirect to login page
-            window.location.href = '/signin';
+            // Dispatch logout event for AuthContext to handle
+            window.dispatchEvent(new Event('auth:logout'));
         }
 
         // Format error response

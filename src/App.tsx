@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -68,7 +68,8 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
 
           {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/error-404" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/error-404" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -6,11 +6,17 @@ import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import UserDropdown from "../components/header/UserDropdown";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
+import { useUser } from "../hooks/useUser";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+
+  // Use the custom useUser hook for data fetching
+  const { user, isLoading, error } = useUser();
+
+  // Debug logging (remove in production)
+  console.log('User Data:', { user, isLoading, error });
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {
@@ -166,7 +172,7 @@ const AppHeader: React.FC = () => {
             {/* <!-- Notification Menu Area --> */}
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown />
+          <UserDropdown dataUser={user} />
         </div>
       </div>
     </header>

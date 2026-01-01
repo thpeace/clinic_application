@@ -3,8 +3,12 @@ import UserMetaCard from "../components/UserProfile/UserMetaCard";
 import UserInfoCard from "../components/UserProfile/UserInfoCard";
 import UserAddressCard from "../components/UserProfile/UserAddressCard";
 import PageMeta from "../components/common/PageMeta";
+import { useUser } from "../hooks/useUser";
 
 export default function UserProfiles() {
+  // Use the custom useUser hook for data fetching
+  const { user, isLoading, error } = useUser();
+
   return (
     <>
       <PageMeta
@@ -17,9 +21,15 @@ export default function UserProfiles() {
           Profile
         </h3>
         <div className="space-y-6">
-          <UserMetaCard />
-          <UserInfoCard />
-          <UserAddressCard />
+          {isLoading && <p className="text-gray-500">Loading...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+          {user && (
+            <>
+              <UserMetaCard dataUser={user} />
+              <UserInfoCard dataUser={user} />
+              <UserAddressCard dataUser={user} />
+            </>
+          )}
         </div>
       </div>
     </>
