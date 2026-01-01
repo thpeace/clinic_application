@@ -4,6 +4,12 @@ import svgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    watch: {
+      usePolling: true, // Required for WSL to detect file changes on Windows filesystem
+      interval: 50, // Aggressive polling for WSL
+    },
+  },
   build: {
     // incrase the chunk size warning limit to 2MB
     outDir: "build",
