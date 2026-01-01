@@ -8,24 +8,30 @@ import {
 import Badge from "../ui/badge/Badge";
 import { useTranslation } from "react-i18next";
 
-export default function EcommerceMetricsClinic() {
+interface EcommerceMetricsClinicProps {
+  totalPatients: number;
+  totalPatientsToday: number;
+}
+
+export default function EcommerceMetricsClinic({ totalPatients, totalPatientsToday }: EcommerceMetricsClinicProps) {
 
   const { t } = useTranslation();
 
-  const [order, setOrder] = useState("");
-  const [customer, setCustomer] = useState("");
-  const [percentOrder, setPercentOrder] = useState("");
-  const [percentCustomer, setPercentCustomer] = useState("");
+  const [order, setOrder] = useState("0");
+  const [customer, setCustomer] = useState("0");
+  const [percentOrder, setPercentOrder] = useState("0");
+  const [percentCustomer, setPercentCustomer] = useState("0");
 
   useEffect(() => {
-    const loadData = async () => {
-      setOrder("5359");
-      setCustomer("3782");
-      setPercentCustomer("11.01");
-      setPercentOrder("9.05");
-    };
-    loadData();
-  }, []);
+    // Guard against division by zero
+    const percentCustomer = totalPatients > 0
+      ? ((totalPatientsToday / totalPatients) * 100).toFixed(2)
+      : "0";
+    setOrder("123");
+    setCustomer(totalPatients.toString());
+    setPercentCustomer(percentCustomer);
+    setPercentOrder("9.05");
+  }, [totalPatients, totalPatientsToday]);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">

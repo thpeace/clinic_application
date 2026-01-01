@@ -17,7 +17,8 @@
         "error": "Error",
         "success": "Success",
         "warning": "Warning",
-        "info": "Info"
+        "info": "Info",
+        "accountSettings": "Account Settings"
     },
     "auth": {
         "signIn": "Sign In",
@@ -136,5 +137,14 @@
         "inactive": "Inactive",
         "outOfStock": "Out of Stock",
         "noClinics": "No clinics found"
+    },
+    "role": {
+        "Administrator": "Administrator",
+        "Doctor": "Medical doctor",
+        "Nurse": "Nursing staff",
+        "Pharmacist": "Pharmacist",
+        "Lab technician": "Lab technician",
+        "Receptionist": "Receptionist",
+        "User": "User"
     }
 }

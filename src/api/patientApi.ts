@@ -1,73 +1,50 @@
 /**
  * Patient API - Pure API calls for patient-related endpoints
+ * Aligned with PatientController.java backend endpoints
  */
 import apiClient from './client';
 import type { PatientDTO } from '../types/dto/patient.dto';
-import type { Patient, CreatePatientRequest } from '../types/patient';
-import type { PaginatedResponse } from '../types/common';
-import { mapPatientDTOToPatient, mapPatientDTOsToPatients } from '../mappers/patientMapper';
+import type { Patient } from '../types/patient';
+import { mapPatientDTOsToPatients } from '../mappers/patientMapper';
 
 // ============================================================================
 // Patient API Functions
 // ============================================================================
 
 /**
- * Get all patients with pagination
+ * Get all patients
+ * Backend: GET /patients
  */
-export async function getAll(page = 0, size = 10): Promise<PaginatedResponse<Patient>> {
-    const response = await apiClient.get<PaginatedResponse<PatientDTO>>('/patients', {
-        params: { page, size },
-    });
-
-    return {
-        ...response.data,
-        content: mapPatientDTOsToPatients(response.data.content),
-    };
+export async function getAll(): Promise<Patient[]> {
+    const response = await apiClient.get<PatientDTO[]>('/patients');
+    return mapPatientDTOsToPatients(response.data);
 }
 
 /**
- * Get a single patient by ID
+ * Get total number of patients
+ * Backend: GET /patients/total
  */
-export async function getById(id: number): Promise<Patient> {
-    const response = await apiClient.get<PatientDTO>(`/patients/${id}`);
-    return mapPatientDTOToPatient(response.data);
+export async function getTotalPatients(): Promise<number> {
+    const response = await apiClient.get<number>('/patients/total');
+    return response.data;
 }
 
 /**
- * Create a new patient
+ * Get total number of patients registered today
+ * Backend: GET /patients/total/today
  */
-export async function create(patient: CreatePatientRequest): Promise<Patient> {
-    const response = await apiClient.post<PatientDTO>('/patients', patient);
-    return mapPatientDTOToPatient(response.data);
+export async function getTotalPatientsToday(): Promise<number> {
+    const response = await apiClient.get<number>('/patients/total/today');
+    return response.data;
 }
 
 /**
- * Update an existing patient
+ * Import patients from external source
+ * Backend: POST /patients/import
  */
-export async function update(id: number, patient: Partial<CreatePatientRequest>): Promise<Patient> {
-    const response = await apiClient.put<PatientDTO>(`/patients/${id}`, patient);
-    return mapPatientDTOToPatient(response.data);
-}
-
-/**
- * Delete a patient
- */
-export async function remove(id: number): Promise<void> {
-    await apiClient.delete(`/patients/${id}`);
-}
-
-/**
- * Search patients by name or other criteria
- */
-export async function search(query: string, page = 0, size = 10): Promise<PaginatedResponse<Patient>> {
-    const response = await apiClient.get<PaginatedResponse<PatientDTO>>('/patients/search', {
-        params: { query, page, size },
-    });
-
-    return {
-        ...response.data,
-        content: mapPatientDTOsToPatients(response.data.content),
-    };
+export async function importPatients(data: { status?: string; data: PatientDTO[]; total?: number; sql?: string }): Promise<string> {
+    const response = await apiClient.post<string>('/patients/import', data);
+    return response.data;
 }
 
 // ============================================================================
@@ -76,11 +53,9 @@ export async function search(query: string, page = 0, size = 10): Promise<Pagina
 
 const patientApi = {
     getAll,
-    getById,
-    create,
-    update,
-    remove,
-    search,
+    getTotalPatients,
+    getTotalPatientsToday,
+    importPatients,
 };
 
 export default patientApi;

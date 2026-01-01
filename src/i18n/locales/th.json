@@ -17,7 +17,8 @@
         "error": "ข้อผิดพลาด",
         "success": "สำเร็จ",
         "warning": "คำเตือน",
-        "info": "ข้อมูล"
+        "info": "ข้อมูล",
+        "accountSettings": "ตั้งค่าบัญชี"
     },
     "auth": {
         "signIn": "เข้าสู่ระบบ",
@@ -136,5 +137,14 @@
         "inactive": "ไม่ใช้งาน",
         "outOfStock": "สินค้าหมด",
         "noClinics": "ไม่พบคลินิก"
+    },
+    "role": {
+        "Administrator": "ผู้ดูแลระบบ",
+        "Doctor": "แพทย์",
+        "Nurse": "พยาบาล",
+        "Pharmacist": "เภสัชกร",
+        "Lab technician": "พยาบาล",
+        "Receptionist": "ผู้จดบันทึก",
+        "User": "ผู้ใช้"
     }
 }

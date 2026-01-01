@@ -6,12 +6,14 @@ import type { User } from "../../types/user";
 import { RoleDisplayName } from "../../constants/userRoles";
 import { getUserDisplayInfo } from "../../mappers/userMapper";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface UserDropdownProps {
   dataUser: User | null;
 }
 
 export default function UserDropdown({ dataUser }: UserDropdownProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -83,7 +85,7 @@ export default function UserDropdown({ dataUser }: UserDropdownProps) {
           </span>
           {roleName && (
             <span className="mt-1 inline-block px-2 py-0.5 text-xs rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-              {roleName}
+              {t("role." + roleName)}
             </span>
           )}
         </div>
@@ -136,7 +138,7 @@ export default function UserDropdown({ dataUser }: UserDropdownProps) {
                   fill=""
                 />
               </svg>
-              Account settings
+              {t("common.accountSettings")}
             </DropdownItem>
           </li>
           {/* <li>
@@ -184,7 +186,7 @@ export default function UserDropdown({ dataUser }: UserDropdownProps) {
               fill=""
             />
           </svg>
-          Sign out
+          {t("auth.signOut")}
         </button>
       </Dropdown>
     </div>

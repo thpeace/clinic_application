@@ -10,14 +10,14 @@ import type { Patient } from '../types/patient';
 export function mapPatientDTOToPatient(dto: PatientDTO): Patient {
     return {
         id: dto.id,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
+        firstName: dto.fname ?? '',
+        lastName: dto.lname ?? '',
         email: dto.email,
-        phone: dto.phone,
-        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
-        address: dto.address,
-        createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
-        updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
+        phone: dto.tel1,
+        dateOfBirth: dto.birthday ? new Date(dto.birthday) : undefined,
+        address: dto.address1,
+        createdAt: dto.dat ? new Date(dto.dat) : undefined,
+        updatedAt: undefined,
     };
 }
 

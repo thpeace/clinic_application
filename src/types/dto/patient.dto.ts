@@ -1,14 +1,66 @@
 /**
- * Patient DTO - Matches backend response shape
+ * Patient DTO - Matches backend response shape (Patient.java)
  */
 export interface PatientDTO {
     id: number;
-    firstName: string;
-    lastName: string;
+    hn?: string;
+    mode?: string;
+    dat?: string;
+    level?: string;
+    pname?: string;
+    fname?: string;
+    lname?: string;
+    nname?: string;
+    sex?: string;
+    personalid?: string;
+    birthday?: string;
+    occupation?: string;
+    nationality?: string;
+    address1?: string;
+    address2?: string;
+    tel1?: string;
+    tel2?: string;
+    tel3?: string;
     email?: string;
-    phone?: string;
-    dateOfBirth?: string;
-    address?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    salary?: number;
+    version?: number;
+    stayin?: string;
+    image?: string;
+    vn?: string;
+    cn?: string;
+    empid?: string;
+    dinose?: string;
+    news?: string;
+    suse?: string;
+    sr?: string;
+    pr?: string;
+    meko?: string;
+    mem?: string;
+    tm?: string;
+    am?: string;
+    province?: string;
+    zip?: string;
+    skin?: string;
+    opt?: string;
+    cdt?: string;
+    cdtext?: string;
+    tnet?: string;
+    edu?: string;
+    cdin?: string;
+    cdruge?: string;
+    rdin?: string;
+    mcode?: string;
+    mdate?: string;
+    mscore?: string;
+    ecode?: string;
+    edate?: string;
+    exdate?: string;
+    status?: string;
+    facebook?: string;
+    line?: string;
+    wg?: string;
+    hg?: string;
+    typ?: string;
+    drugeanti?: string;
+    clinicname?: string;
 }

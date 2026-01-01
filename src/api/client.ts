@@ -80,11 +80,14 @@ apiClient.interceptors.response.use(
 
         // Check if we should logout:
         // 1. It's not a login/signup request (auth)
-        // 2. Status is in our LOGOUT set OR it's a network error (!status)
+        // 2. Status is 401 (Unauthorized) or 403 (Forbidden)
+        // Note: We don't logout on network errors (!status) as that would cause
+        // unintended logouts when the backend is down or endpoints fail
         const shouldLogout =
             originalRequest &&
             !isAuthRequest &&
-            (LOGOUT_STATUS_CODES.has(status!) || !status);
+            status !== undefined &&
+            LOGOUT_STATUS_CODES.has(status);
 
         if (shouldLogout) {
             // Clear tokens
