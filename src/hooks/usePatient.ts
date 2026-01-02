@@ -36,7 +36,7 @@ export function usePatientList(): UsePatientListReturn {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
-            const response = await patientApi.getAll(page, size);
+            const response = await patientApi.getAllPaginated(page, size);
             const { content, ...pagination } = response;
             setState({ patients: content, pagination, isLoading: false, error: null });
         } catch (err) {

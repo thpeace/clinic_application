@@ -9,7 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useTranslation } from "react-i18next";
 
 interface UserDropdownProps {
-  dataUser: User | null;
+  dataUser?: User | null;
 }
 
 export default function UserDropdown({ dataUser }: UserDropdownProps) {
@@ -31,7 +31,7 @@ export default function UserDropdown({ dataUser }: UserDropdownProps) {
     navigate('/signin');
   };
 
-  const { displayName, initials, fullName } = getUserDisplayInfo(dataUser);
+  const { displayName, initials, fullName } = getUserDisplayInfo(dataUser ?? null);
   const email = dataUser?.email || '';
   const roleName = dataUser?.role ? RoleDisplayName[dataUser.role] : '';
 

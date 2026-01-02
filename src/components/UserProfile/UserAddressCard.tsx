@@ -102,7 +102,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                 <div>
                   <Label>Country</Label>
-                  <Input type="text" value={dataUser?.country} />
+                  <Input type="text" value={dataUser?.country ?? ""} />
                 </div>
 
                 <div>
@@ -112,7 +112,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
 
                 <div>
                   <Label>Postal Code</Label>
-                  <Input type="text" value={dataUser?.postalCode} />
+                  <Input type="text" value={dataUser?.postalCode ?? ""} />
                 </div>
 
                 {/* <div>
