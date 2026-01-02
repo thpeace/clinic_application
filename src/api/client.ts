@@ -61,7 +61,7 @@ apiClient.interceptors.request.use(
         return config;
     },
     (error: AxiosError) => {
-        return Promise.reject(error);
+        throw error;
     }
 );
 
@@ -106,7 +106,7 @@ apiClient.interceptors.response.use(
             errors: error.response?.data?.errors,
         };
 
-        return Promise.reject(apiError);
+        throw apiError;
     }
 );
 
