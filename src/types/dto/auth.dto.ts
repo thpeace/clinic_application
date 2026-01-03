@@ -10,6 +10,7 @@ export interface LoginResponseDTO {
     token: string;
     type?: string;
     expiresIn?: number;
+    role?: string;
 }
 
 /**

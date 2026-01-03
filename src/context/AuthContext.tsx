@@ -1,6 +1,7 @@
 import type React from "react";
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import authApi from "../api/authApi";
+import userApi from "../api/userApi";
 import type { AuthUser, LoginRequest, SignupRequest, AuthResponse } from "../types/auth";
 import { ApiError } from "../api/client";
 
@@ -53,11 +54,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing auth on mount and set up event listener
     useEffect(() => {
-        const initAuth = () => {
+        const initAuth = async () => {
             try {
-                const currentUser = authApi.getStoredUser();
-                if (currentUser && authApi.isAuthenticated()) {
-                    setUser(currentUser);
+                // Get basic info from token
+                const tokenUser = authApi.getStoredUser();
+                if (tokenUser && authApi.isAuthenticated()) {
+                    setUser(tokenUser);
+
+                    // Fetch full profile from API
+                    try {
+                        const fullUser = await userApi.getCurrentUser();
+                        // Merge token info (role) with backend profile
+                        // Handle role type mismatch (UserRole | null vs string | undefined)
+                        const role = fullUser.role || undefined;
+
+                        setUser(prev => ({
+                            ...prev!,
+                            ...fullUser,
+                            role: role
+                        }));
+                    } catch (err) {
+                        console.error("Failed to fetch user profile", err);
+                    }
                 }
             } catch {
                 // Invalid stored data, clear it
@@ -88,6 +106,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await authApi.login(credentials);
             setUser(response.user);
+
+            // Fetch full profile immediately
+            try {
+                const fullUser = await userApi.getCurrentUser();
+                const role = fullUser.role || undefined;
+                const mergedUser = { ...response.user, ...fullUser, role };
+
+                setUser(mergedUser);
+                response.user = mergedUser;
+            } catch (err) {
+                console.error("Failed to fetch user profile after login", err);
+            }
+
             return response;
         } catch (err) {
             const apiError = err as ApiError;
@@ -136,6 +167,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await authApi.signup(userData);
             setUser(response.user);
+
+            // Fetch full profile immediately
+            try {
+                const fullUser = await userApi.getCurrentUser();
+                const role = fullUser.role || undefined;
+                const mergedUser = { ...response.user, ...fullUser, role };
+
+                setUser(mergedUser);
+                response.user = mergedUser;
+            } catch (err) {
+                console.error("Failed to fetch user profile after signup", err);
+            }
+
             return response;
         } catch (err) {
             const apiError = err as ApiError;

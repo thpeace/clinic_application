@@ -10,6 +10,7 @@ import type { AuthResponse, AuthUser } from '../types/auth';
 export function mapLoginResponseToAuth(dto: LoginResponseDTO): AuthResponse {
     const user: AuthUser = {
         username: dto.username,
+        role: dto.role,
     };
 
     return {
