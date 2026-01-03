@@ -25,7 +25,7 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; roles?: string[] }[];
   roles?: string[]; // Roles that can view this item (if undefined, all roles can view)
 };
 
@@ -33,23 +33,20 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "Team",
-    path: "/team",
-    roles: [UserRole.ADMIN, UserRole.DOCTOR],
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    subItems: [
+      { name: "Ecommerce", path: "/", pro: false },
+      { name: "Team", path: "/team", pro: false, roles: [UserRole.ADMIN, UserRole.DOCTOR] },
+    ],
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Calendar",
+    path: "/calendar",
   },
   {
     name: "Forms",
@@ -61,7 +58,10 @@ const navItems: NavItem[] = [
   {
     name: "Tables",
     icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false },
+    { name: "Filter Tables", path: "/filter-tables", pro: false },
+    { name: "Patient Tables", path: "/patient-tables", pro: false },
+    ],
   },
   {
     name: "Pages",
