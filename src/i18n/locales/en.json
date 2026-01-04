@@ -164,5 +164,18 @@
         "inactive": "Inactive",
         "outOfStock": "Out of Stock",
         "noTeams": "No teams found"
+    },
+    "profile": {
+        "title": "Profile",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "address": "Address",
+        "noProfile": "No Profile found",
+        "personalInfo": "Personal Information",
+        "contactInfo": "Contact Information",
+        "addressInfo": "Address Information"
     }
 }

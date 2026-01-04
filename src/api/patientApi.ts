@@ -13,27 +13,30 @@ import { mapPatientDTOsToPatients, mapPatientDTOToPatient } from '../mappers/pat
 // ============================================================================
 
 /**
- * Get all patients (non-paginated)
- * Backend: GET /patients
- */
-export async function getAll(): Promise<Patient[]> {
-    const response = await apiClient.get<PatientDTO[]>('/patients');
-    return mapPatientDTOsToPatients(response.data);
-}
-
-/**
  * Get all patients with pagination
- * Backend: GET /patients?page={page}&size={size}
+ * Backend: GET /api/patients?page={page}&size={size}
+ * Note: Size must be one of: 10, 20, 50, 100, 500 (defaults to 10 if invalid)
  */
-export async function getAllPaginated(page: number = 0, size: number = 10): Promise<PaginatedResponse<Patient>> {
-    const response = await apiClient.get<PaginatedResponse<PatientDTO>>('/patients', {
+export async function getAll(page: number = 0, size: number = 10): Promise<PaginatedResponse<Patient>> {
+    const response = await apiClient.get<any>('/patients', {
         params: { page, size }
     });
+
+    // Backend returns Spring Page format
     return {
-        ...response.data,
-        content: mapPatientDTOsToPatients(response.data.content)
+        content: mapPatientDTOsToPatients(response.data.content),
+        totalElements: response.data.totalElements,
+        totalPages: response.data.totalPages,
+        size: response.data.size,
+        number: response.data.number,
+        numberOfElements: response.data.numberOfElements,
+        first: response.data.first,
+        last: response.data.last,
+        empty: response.data.empty
     };
 }
+
+
 
 /**
  * Search patients by query
@@ -77,7 +80,8 @@ export async function remove(id: number): Promise<void> {
 
 /**
  * Get total number of patients
- * Backend: GET /patients/total
+ * Backend: GET /api/patients/total
+ * @returns Total count of patients (Long)
  */
 export async function getTotalPatients(): Promise<number> {
     const response = await apiClient.get<number>('/patients/total');
@@ -86,7 +90,8 @@ export async function getTotalPatients(): Promise<number> {
 
 /**
  * Get total number of patients registered today
- * Backend: GET /patients/total/today
+ * Backend: GET /api/patients/total/today
+ * @returns Total count of patients created today (Long)
  */
 export async function getTotalPatientsToday(): Promise<number> {
     const response = await apiClient.get<number>('/patients/total/today');
@@ -95,7 +100,9 @@ export async function getTotalPatientsToday(): Promise<number> {
 
 /**
  * Import patients from external source
- * Backend: POST /patients/import
+ * Backend: POST /api/patients/import
+ * @param data PatientResponse object with data array
+ * @returns Success message with count
  */
 export async function importPatients(data: { status?: string; data: PatientDTO[]; total?: number; sql?: string }): Promise<string> {
     const response = await apiClient.post<string>('/patients/import', data);
@@ -108,7 +115,6 @@ export async function importPatients(data: { status?: string; data: PatientDTO[]
 
 const patientApi = {
     getAll,
-    getAllPaginated,
     search,
     create,
     update,

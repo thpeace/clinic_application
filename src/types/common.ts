@@ -11,8 +11,10 @@ export interface PaginatedResponse<T> {
     totalElements: number;
     size: number;
     number: number;
+    numberOfElements: number;  // Added to match Spring Page
     first: boolean;
     last: boolean;
+    empty: boolean;  // Added to match Spring Page
 }
 
 /**

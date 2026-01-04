@@ -4,6 +4,7 @@ import PageMeta from "../../components/common/PageMeta";
 import PatientTablesOne from "../../components/tables/PatientTables/PatientTablesOne";
 
 export default function PatientTable() {
+
     return (
         <>
             <PageMeta

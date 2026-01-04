@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     Table,
     TableBody,
@@ -6,79 +6,85 @@ import {
     TableHeader,
     TableRow,
 } from "../../ui/table";
+import patientApi from "../../../api/patientApi";
+import type { Patient, CreatePatientRequest } from "../../../types/patient";
+import type { PaginatedResponse } from "../../../types/common";
 
-interface Patient {
-    id: number;
-    hn: string;
-    firstName: string;
-    lastName: string;
-    nickname: string;
-    phoneNumber: string;
-}
-
-// Sample data - replace with API data
-const samplePatients: Patient[] = Array.from({ length: 50 }, (_, i) => ({
-    id: i + 1,
-    hn: `HN${String(i + 1).padStart(6, "0")}`,
-    firstName: ["สมชาย", "สมหญิง", "สมศักดิ์", "สมศรี", "สมบัติ"][i % 5],
-    lastName: ["ใจดี", "รักสงบ", "มีสุข", "สุขใจ", "ดีงาม"][i % 5],
-    nickname: ["ชาย", "หญิง", "เก่ง", "ศรี", "บัติ"][i % 5],
-    phoneNumber: `08${String(Math.floor(Math.random() * 100000000)).padStart(8, "0")}`,
-}));
-
-const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100, 500];
 
 export default function PatientTablesOne() {
-    const [patients, setPatients] = useState<Patient[]>(samplePatients);
+    // API data state
+    const [paginatedResponse, setPaginatedResponse] = useState<PaginatedResponse<Patient> | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // UI state
     const [searchTerm, setSearchTerm] = useState("");
     const [pageSize, setPageSize] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0); // Backend uses 0-based indexing
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editForm, setEditForm] = useState<Patient | null>(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [newPatient, setNewPatient] = useState<Omit<Patient, "id">>({
+    const [newPatient, setNewPatient] = useState<Partial<Patient>>({
         hn: "",
-        firstName: "",
-        lastName: "",
-        nickname: "",
-        phoneNumber: "",
+        fname: "",
+        lname: "",
+        tel1: "",
     });
 
-    // Filter data based on search term
+    // Fetch patients from API
+    useEffect(() => {
+        const fetchPatients = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await patientApi.getAll(currentPage, pageSize);
+                console.log("data", data);
+                setPaginatedResponse(data);
+            } catch (err) {
+                console.error("Failed to fetch patients:", err);
+                setError("Failed to load patients. Please try again.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPatients();
+    }, [currentPage, pageSize]);
+
+    const patients = paginatedResponse?.content || [];
+
+    // Filter data based on search term (client-side filtering for current page)
     const filteredData = useMemo(() => {
         if (!searchTerm.trim()) return patients;
         const lowerSearch = searchTerm.toLowerCase();
         return patients.filter(
             (patient) =>
-                patient.hn.toLowerCase().includes(lowerSearch) ||
-                patient.firstName.toLowerCase().includes(lowerSearch) ||
-                patient.lastName.toLowerCase().includes(lowerSearch) ||
-                patient.nickname.toLowerCase().includes(lowerSearch) ||
-                patient.phoneNumber.includes(lowerSearch)
+                (patient.hn?.toLowerCase().includes(lowerSearch) ?? false) ||
+                (patient.fname?.toLowerCase().includes(lowerSearch) ?? false) ||
+                (patient.lname?.toLowerCase().includes(lowerSearch) ?? false) ||
+                (patient.nname?.toLowerCase().includes(lowerSearch) ?? false) ||
+                (patient.tel1?.includes(lowerSearch) ?? false)
         );
     }, [searchTerm, patients]);
 
-    // Paginate data
-    const paginatedData = useMemo(() => {
-        const startIndex = (currentPage - 1) * pageSize;
-        return filteredData.slice(startIndex, startIndex + pageSize);
-    }, [filteredData, currentPage, pageSize]);
-
-    const totalPages = Math.ceil(filteredData.length / pageSize);
+    // Use server-side pagination data directly
+    const paginatedData = filteredData;
+    const totalPages = paginatedResponse?.totalPages || 0;
+    const totalElements = paginatedResponse?.totalElements || 0;
 
     const handleSearchChange = (value: string) => {
         setSearchTerm(value);
-        setCurrentPage(1);
     };
 
     const handlePageSizeChange = (size: number) => {
         setPageSize(size);
-        setCurrentPage(1);
+        setCurrentPage(0); // Reset to first page
     };
 
     // Edit handlers
     const handleEditClick = (patient: Patient) => {
-        setEditingId(patient.id);
+        setEditingId(patient.id || null);
         setEditForm({ ...patient });
     };
 
@@ -87,11 +93,19 @@ export default function PatientTablesOne() {
         setEditForm(null);
     };
 
-    const handleEditSave = () => {
-        if (editForm) {
-            setPatients(patients.map((p) => (p.id === editForm.id ? editForm : p)));
-            setEditingId(null);
-            setEditForm(null);
+    const handleEditSave = async () => {
+        if (editForm && editForm.id) {
+            try {
+                // TODO: Call API to update patient
+                await patientApi.update(editForm.id, editForm);
+                // Refresh data
+                const data = await patientApi.getAll(currentPage, pageSize);
+                setPaginatedResponse(data);
+                setEditingId(null);
+                setEditForm(null);
+            } catch (err) {
+                console.error("Failed to update patient:", err);
+            }
         }
     };
 
@@ -102,22 +116,62 @@ export default function PatientTablesOne() {
     };
 
     // Add new patient handlers
-    const handleAddPatient = () => {
-        const newId = Math.max(...patients.map((p) => p.id), 0) + 1;
-        setPatients([...patients, { ...newPatient, id: newId }]);
-        setNewPatient({
-            hn: "",
-            firstName: "",
-            lastName: "",
-            nickname: "",
-            phoneNumber: "",
-        });
-        setIsAddModalOpen(false);
+    const handleAddPatient = async () => {
+        try {
+            // TODO: Call API to create patient
+            await patientApi.create(newPatient as CreatePatientRequest);
+            // Refresh data
+            const data = await patientApi.getAll(currentPage, pageSize);
+            setPaginatedResponse(data);
+            setNewPatient({
+                hn: "",
+                fname: "",
+                lname: "",
+                nname: "",
+                tel1: "",
+            });
+            setIsAddModalOpen(false);
+        } catch (err) {
+            console.error("Failed to create patient:", err);
+        }
     };
 
-    const handleNewPatientChange = (field: keyof Omit<Patient, "id">, value: string) => {
+    const handleNewPatientChange = (field: keyof Patient, value: string) => {
         setNewPatient({ ...newPatient, [field]: value });
     };
+
+    // Loading state
+    if (loading && !paginatedResponse) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                    <svg className="w-8 h-8 animate-spin text-brand-500" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Loading patients...</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center py-12">
+                <svg className="w-12 h-12 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-gray-600 dark:text-gray-400">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="mt-4 px-4 py-2 text-sm font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -189,10 +243,7 @@ export default function PatientTablesOne() {
                                 HN
                             </TableCell>
                             <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                                First Name
-                            </TableCell>
-                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                                Last Name
+                                Full Name
                             </TableCell>
                             <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                                 Nickname
@@ -200,8 +251,11 @@ export default function PatientTablesOne() {
                             <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                                 Phone Number
                             </TableCell>
+                            <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                                TAX ID
+                            </TableCell>
                             <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                                Actions
+                                Edit
                             </TableCell>
                         </TableRow>
                     </TableHeader>
@@ -223,32 +277,32 @@ export default function PatientTablesOne() {
                                             <TableCell className="px-5 py-4">
                                                 <input
                                                     type="text"
-                                                    value={editForm?.firstName || ""}
-                                                    onChange={(e) => handleEditChange("firstName", e.target.value)}
+                                                    value={editForm?.fname || ""}
+                                                    onChange={(e) => handleEditChange("fname", e.target.value)}
                                                     className="w-full px-2 py-1 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                                 />
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
                                                 <input
                                                     type="text"
-                                                    value={editForm?.lastName || ""}
-                                                    onChange={(e) => handleEditChange("lastName", e.target.value)}
+                                                    value={editForm?.lname || ""}
+                                                    onChange={(e) => handleEditChange("lname", e.target.value)}
                                                     className="w-full px-2 py-1 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                                 />
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
                                                 <input
                                                     type="text"
-                                                    value={editForm?.nickname || ""}
-                                                    onChange={(e) => handleEditChange("nickname", e.target.value)}
+                                                    value={editForm?.nname || ""}
+                                                    onChange={(e) => handleEditChange("nname", e.target.value)}
                                                     className="w-full px-2 py-1 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                                 />
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
                                                 <input
                                                     type="text"
-                                                    value={editForm?.phoneNumber || ""}
-                                                    onChange={(e) => handleEditChange("phoneNumber", e.target.value)}
+                                                    value={editForm?.tel1 || ""}
+                                                    onChange={(e) => handleEditChange("tel1", e.target.value)}
                                                     className="w-full px-2 py-1 text-sm border border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                                                 />
                                             </TableCell>
@@ -275,16 +329,16 @@ export default function PatientTablesOne() {
                                                 {patient.hn}
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
-                                                {patient.firstName}
+                                                {patient.fname + " " + patient.lname}
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
-                                                {patient.lastName}
+                                                {patient.nname}
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
-                                                {patient.nickname}
+                                                {patient.tel3}
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
-                                                {patient.phoneNumber}
+                                                {patient.personalid}
                                             </TableCell>
                                             <TableCell className="px-5 py-4">
                                                 <div className="flex items-center justify-center">
@@ -319,30 +373,30 @@ export default function PatientTablesOne() {
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                     Showing{" "}
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {filteredData.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}
+                        {totalElements > 0 ? currentPage * pageSize + 1 : 0}
                     </span>{" "}
                     to{" "}
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {Math.min(currentPage * pageSize, filteredData.length)}
+                        {Math.min((currentPage + 1) * pageSize, totalElements)}
                     </span>{" "}
                     of{" "}
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                        {filteredData.length}
+                        {totalElements}
                     </span>{" "}
                     patients
                 </div>
 
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => setCurrentPage(1)}
-                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(0)}
+                        disabled={currentPage === 0}
                         className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
                     >
                         First
                     </button>
                     <button
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+                        disabled={currentPage === 0}
                         className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
                     >
                         Previous
@@ -352,11 +406,11 @@ export default function PatientTablesOne() {
                         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                             let pageNum;
                             if (totalPages <= 5) {
-                                pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                                pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
+                                pageNum = i;
+                            } else if (currentPage <= 2) {
+                                pageNum = i;
+                            } else if (currentPage >= totalPages - 3) {
+                                pageNum = totalPages - 5 + i;
                             } else {
                                 pageNum = currentPage - 2 + i;
                             }
@@ -369,7 +423,7 @@ export default function PatientTablesOne() {
                                         : "border border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 dark:text-gray-300"
                                         }`}
                                 >
-                                    {pageNum}
+                                    {pageNum + 1}
                                 </button>
                             );
                         })}
@@ -429,8 +483,8 @@ export default function PatientTablesOne() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={newPatient.firstName}
-                                    onChange={(e) => handleNewPatientChange("firstName", e.target.value)}
+                                    value={newPatient.fname}
+                                    onChange={(e) => handleNewPatientChange("fname", e.target.value)}
                                     placeholder="Enter first name"
                                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
@@ -441,8 +495,8 @@ export default function PatientTablesOne() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={newPatient.lastName}
-                                    onChange={(e) => handleNewPatientChange("lastName", e.target.value)}
+                                    value={newPatient.lname}
+                                    onChange={(e) => handleNewPatientChange("lname", e.target.value)}
                                     placeholder="Enter last name"
                                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
@@ -453,8 +507,8 @@ export default function PatientTablesOne() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={newPatient.nickname}
-                                    onChange={(e) => handleNewPatientChange("nickname", e.target.value)}
+                                    value={newPatient.nname}
+                                    onChange={(e) => handleNewPatientChange("nname", e.target.value)}
                                     placeholder="Enter nickname"
                                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
@@ -465,8 +519,8 @@ export default function PatientTablesOne() {
                                 </label>
                                 <input
                                     type="text"
-                                    value={newPatient.phoneNumber}
-                                    onChange={(e) => handleNewPatientChange("phoneNumber", e.target.value)}
+                                    value={newPatient.tel1}
+                                    onChange={(e) => handleNewPatientChange("tel1", e.target.value)}
                                     placeholder="Enter phone number"
                                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 />
@@ -482,7 +536,7 @@ export default function PatientTablesOne() {
                             </button>
                             <button
                                 onClick={handleAddPatient}
-                                disabled={!newPatient.hn || !newPatient.firstName || !newPatient.lastName}
+                                disabled={!newPatient.hn || !newPatient.fname || !newPatient.lname}
                                 className="px-4 py-2 text-sm font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Add Patient

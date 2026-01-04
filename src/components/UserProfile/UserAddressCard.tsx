@@ -4,10 +4,12 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { User } from "../../types";
+import { useTranslation } from "react-i18next";
 interface UserAddressCardProps {
   dataUser: User | null;
 }
 export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
+  const { t } = useTranslation();
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here
@@ -22,7 +24,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-              Address
+              {t("profile.addressInfo")}
             </h4>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">

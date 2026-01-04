@@ -164,5 +164,18 @@
         "inactive": "ไม่ใช้งาน",
         "outOfStock": "สินค้าหมด",
         "noTeams": "ไม่พบทีม"
+    },
+    "profile": {
+        "title": "โปรไฟล์",
+        "firstName": "ชื่อ",
+        "lastName": "นามสกุล",
+        "email": "อีเมล",
+        "phone": "โทรศัพท์",
+        "role": "สิทธิการเข้าถึง",
+        "address": "ที่อยู่",
+        "noProfile": "ไม่พบโปรไฟล์",
+        "personalInfo": "ข้อมูลส่วนตัว",
+        "contactInfo": "ข้อมูลติดต่อ",
+        "addressInfo": "ข้อมูลที่อยู่"
     }
 }
