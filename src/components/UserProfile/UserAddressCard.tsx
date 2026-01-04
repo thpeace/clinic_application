@@ -30,7 +30,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Country
+                  {t("profile.country")}
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   {dataUser?.country}
@@ -39,7 +39,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  City/State
+                  {t("profile.city")}/{t("profile.state")}
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   {cityState}
@@ -48,7 +48,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
 
               <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                  Postal Code
+                  {t("profile.zipCode")}
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   {dataUser?.postalCode}
@@ -85,7 +85,7 @@ export default function UserAddressCard({ dataUser }: UserAddressCardProps) {
                 fill=""
               />
             </svg>
-            Edit
+            {t("common.edit")}
           </button>
         </div>
       </div>

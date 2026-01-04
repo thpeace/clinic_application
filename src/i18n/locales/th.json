@@ -176,6 +176,10 @@
         "noProfile": "ไม่พบโปรไฟล์",
         "personalInfo": "ข้อมูลส่วนตัว",
         "contactInfo": "ข้อมูลติดต่อ",
-        "addressInfo": "ข้อมูลที่อยู่"
+        "addressInfo": "ข้อมูลที่อยู่",
+        "country": "ประเทศ",
+        "city": "เมือง",
+        "state": "จังหวัด",
+        "zipCode": "รหัสไปรษณีย์"
     }
 }

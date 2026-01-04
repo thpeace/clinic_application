@@ -94,7 +94,7 @@ export default function UserInfoCard({ dataUser }: UserInfoCardProps) {
               fill=""
             />
           </svg>
-          Edit
+          {t("common.edit")}
         </button>
       </div>
 

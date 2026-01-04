@@ -176,6 +176,10 @@
         "noProfile": "No Profile found",
         "personalInfo": "Personal Information",
         "contactInfo": "Contact Information",
-        "addressInfo": "Address Information"
+        "addressInfo": "Address Information",
+        "country": "Country",
+        "city": "City",
+        "state": "State",
+        "zipCode": "Zip Code"
     }
 }
