@@ -120,7 +120,6 @@ docker build -f Dockerfile.production -t clinic-app-prod .
 | `/form-elements` | Form Elements |
 | `/basic-tables` | Data Tables |
 | `/signin` | Sign In Page |
-| `/signup` | Sign Up Page |
 
 ## 🤝 Contributing
 

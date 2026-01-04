@@ -28,7 +28,7 @@ export default function UserDropdown({ dataUser }: UserDropdownProps) {
 
   const handleLogout = () => {
     logout();
-    navigate('/signin');
+    navigate('/login');
   };
 
   const { displayName, initials, fullName } = getUserDisplayInfo(dataUser ?? null);

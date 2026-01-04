@@ -146,5 +146,23 @@
         "Lab technician": "Lab technician",
         "Receptionist": "Receptionist",
         "User": "User"
+    },
+    "team": {
+        "title": "Team",
+        "addTeam": "Add Team",
+        "editTeam": "Edit Team",
+        "deleteTeam": "Delete Team",
+        "teamList": "Team List",
+        "teamDetails": "Team Details",
+        "name": "Name",
+        "description": "Description",
+        "price": "Price",
+        "quantity": "Quantity",
+        "status": "Status",
+        "category": "Category",
+        "active": "Active",
+        "inactive": "Inactive",
+        "outOfStock": "Out of Stock",
+        "noTeams": "No teams found"
     }
 }

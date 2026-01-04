@@ -35,13 +35,16 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     subItems: [
       { name: "Ecommerce", path: "/", pro: false },
-      { name: "Team", path: "/team", pro: false, roles: [UserRole.ADMIN, UserRole.DOCTOR] },
     ],
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
+    name: "Profile",
+    subItems: [
+      { name: "Profile", path: "/profile", pro: false },
+      { name: "Team", path: "/team", pro: false, roles: [UserRole.ADMIN, UserRole.DOCTOR] },
+      { name: "Patients", path: "/patients", pro: false, roles: [UserRole.ADMIN, UserRole.DOCTOR, UserRole.NURSE, UserRole.RECEPTIONIST, UserRole.PHARMACIST, UserRole.LAB_TECHNICIAN] },
+    ],
   },
   {
     icon: <CalenderIcon />,

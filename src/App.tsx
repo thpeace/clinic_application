@@ -1,29 +1,22 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
-import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
-import NotFound from "./pages/OtherPage/NotFound";
-import UserProfiles from "./pages/UserProfiles";
-import Videos from "./pages/UiElements/Videos";
-import Images from "./pages/UiElements/Images";
-import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
-import UserForm from "./pages/Forms/UserForm";
-import Blank from "./pages/Blank";
-import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import MyHome from "./pages/Dashboard/MyHome";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import ProfilesTables from "./pages/Tables/ProfilesTables";
-import FiltersTable from "./pages/Tables/FiltersTable";
-import PatientTable from "./pages/Tables/PatientTable";
+import AppLayout from "./layout/AppLayout";
+import { protectedRoutes, publicRoutes } from "./routes";
+import { Suspense } from "react";
+
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center gap-3">
+      <svg className="w-8 h-8 animate-spin text-brand-500" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+      </svg>
+      <span className="text-sm text-gray-500 dark:text-gray-400">Loading...</span>
+    </div>
+  </div>
+);
 
 export default function App() {
   return (
@@ -31,50 +24,27 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Protected Dashboard Layout */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index path="/" element={<MyHome />} />
-
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/blank" element={<Blank />} />
-            <Route path="/team" element={<ProfilesTables />} />
-
-            {/* Forms */}
-            <Route path="/form-user" element={<UserForm />} />
-            <Route path="/form-elements" element={<FormElements />} />
-
-            {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
-            <Route path="/filter-tables" element={<FiltersTable />} />
-            <Route path="/patient-tables" element={<PatientTable />} />
-
-            {/* Ui Elements */}
-            <Route path="/alerts" element={<Alerts />} />
-            <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
-            <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
-            <Route path="/videos" element={<Videos />} />
-
-            {/* Charts */}
-            <Route path="/line-chart" element={<LineChart />} />
-            <Route path="/bar-chart" element={<BarChart />} />
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            {protectedRoutes.map((route) => (
+              <Route
+                key={route.path || "index"}
+                {...route}
+                element={<Suspense fallback={<LoadingFallback />}>{route.element}</Suspense>}
+              />
+            ))}
           </Route>
 
-          {/* Auth Layout (Public) */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+          {/* Public Routes */}
+          {publicRoutes.map((route) => (
+            <Route
+              key={route.path}
+              {...route}
+              element={<Suspense fallback={<LoadingFallback />}>{route.element}</Suspense>}
+            />
+          ))}
 
-          {/* Fallback Route */}
-          <Route path="/error-404" element={<NotFound />} />
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/error-404" replace />} />
         </Routes>
       </Router>

@@ -11,6 +11,7 @@ import { mapUserDetailDTOToUser } from '../mappers/userMapper';
 // ============================================================================
 
 const USER_ENDPOINTS = {
+    BASE: '/users',
     ME: '/users/me',
     BY_ID: (id: number) => `/users/${id}`,
 } as const;
@@ -18,6 +19,15 @@ const USER_ENDPOINTS = {
 // ============================================================================
 // User API Functions
 // ============================================================================
+
+/**
+ * Get all users
+ * Maps to: GET /api/users
+ */
+export async function getAllUsers(): Promise<User[]> {
+    const response = await apiClient.get<UserDetailDTO[]>(USER_ENDPOINTS.BASE);
+    return response.data.map(mapUserDetailDTOToUser);
+}
 
 /**
  * Get current logged-in user's details
@@ -42,6 +52,7 @@ export async function getUserById(id: number): Promise<User> {
 // ============================================================================
 
 const userApi = {
+    getAllUsers,
     getCurrentUser,
     getUserById,
 };

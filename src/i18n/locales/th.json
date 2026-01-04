@@ -146,5 +146,23 @@
         "Lab technician": "พยาบาล",
         "Receptionist": "ผู้จดบันทึก",
         "User": "ผู้ใช้"
+    },
+    "team": {
+        "title": "ทีม",
+        "addTeam": "เพิ่มทีม",
+        "editTeam": "แก้ไขทีม",
+        "deleteTeam": "ลบทีม",
+        "teamList": "รายการทีม",
+        "teamDetails": "รายละเอียดทีม",
+        "name": "ชื่อ",
+        "description": "คำอธิบาย",
+        "price": "ราคา",
+        "quantity": "จำนวน",
+        "status": "สถานะ",
+        "category": "หมวดหมู่",
+        "active": "ใช้งาน",
+        "inactive": "ไม่ใช้งาน",
+        "outOfStock": "สินค้าหมด",
+        "noTeams": "ไม่พบทีม"
     }
 }
